@@ -83,7 +83,7 @@ class MarsRoverTest {
     }
 
     @Test
-    fun `Given (0, 0) when direction = N and command is {F, F, L, R, B} then ()`() {
+    fun `Given (0, 0) when direction = N and command is {F, F, L, R, B} then (2, 0)`() {
         val rover = Rover(Pair(0, 0), Direction.N, provideMarsWithNoObstacles())
         rover.move(listOf(Command.F, Command.F, Command.L, Command.R, Command.B))
         assert(2 == rover.position.first)
@@ -91,7 +91,7 @@ class MarsRoverTest {
     }
 
     @Test
-    fun `Given (0, 0) when direction = S and command is {B, B, F, L, R, B, F, R, L, F, B, R}`() {
+    fun `Given (0, 0) when direction = S and command is {B, B, F, L, R, B, F, R, L, F, B, R} then (2, 0)`() {
         val rover = Rover(Pair(0, 0), Direction.S, provideMarsWithNoObstacles())
         rover.move(
             listOf(
@@ -114,8 +114,39 @@ class MarsRoverTest {
     }
 
     @Test
-    fun `Given (2, 1) when direction = E and command is {R, F, F, L, F, F, B, L, F, R, F}`() {
+    fun `Given (2, 1) when direction = E and command is {R, F, F, L, F, F, B, L, F, R, F} then (0, 0)`() {
+        val rover = Rover(Pair(2, 1), Direction.E, provideMarsWithNoObstacles())
+        rover.move(
+            listOf(
+                Command.R,
+                Command.F,
+                Command.F,
+                Command.L,
+                Command.F,
+                Command.F,
+                Command.B,
+                Command.L,
+                Command.F,
+                Command.R,
+                Command.F
+            )
+        )
+        assert(0 == rover.position.first)
+        assert(0 == rover.position.second)
+    }
 
+    @Test
+    fun `Given (0, 0) when direction = E and command is {F, F, F} then (0, 1)`() {
+        val rover = Rover(direction = Direction.E, planet = provideMarsWithObstacles())
+        try {
+            rover.move(
+                listOf(Command.F, Command.F, Command.F)
+            )
+        } catch (exception: Exception) {
+            assert(exception is ObstacleException)
+            assert(2 == rover.position.first)
+            assert(2 == rover.position.second)
+        }
     }
 
     companion object {
@@ -125,6 +156,16 @@ class MarsRoverTest {
                     listOf(false, false, false),
                     listOf(false, false, false),
                     listOf(false, false, false)
+                )
+            )
+        }
+
+        fun provideMarsWithObstacles(): Planet {
+            return Planet(
+                listOf(
+                    listOf(false, false, true),
+                    listOf(false, true, false),
+                    listOf(false, true, false)
                 )
             )
         }
