@@ -5,6 +5,9 @@ data class Rover(
     var direction: Direction,
     var planet: Planet
 ) {
+    companion object {
+        const val ABORT_WHEN_OBSTACLE_FOUND = "obstacle found"
+    }
 
     fun move(commands: List<Command>) {
         commands.forEach { command ->
@@ -34,15 +37,20 @@ data class Rover(
             position = Pair(position.first.myMod(planet.height), position.second.myMod(planet.width))
 
             if (planet.grid[position.first][position.second]) {
-                val obstaclePosition = position.copy()
                 position = planet.lastSafePoint ?: position
-                throw ObstacleException("obstacle found at ${obstaclePosition.first}, ${obstaclePosition.second}")
+                throw Exception(ABORT_WHEN_OBSTACLE_FOUND)
             }
         }
     }
-}
 
-class ObstacleException(message: String) : Exception(message)
+    fun isInPosition(aPosition: Pair<Int, Int>): Boolean {
+        return this.position.first == aPosition.first && this.position.second == aPosition.second
+    }
+
+    fun isPointingTo(aDirection: Direction): Boolean {
+        return this.direction == aDirection
+    }
+}
 
 data class Planet(val grid: List<List<Boolean>>) {
     val height get() = grid.size
